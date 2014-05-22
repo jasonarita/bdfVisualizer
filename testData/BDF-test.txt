@@ -1,0 +1,11 @@
+bin 1
+Incompatible, Correct
+.{21;22}{~111;212;211;112;221;122}{t<200-1000>121;222}
+
+bin 2
+Flagged 1st responses only - NO Negation - Incompatible, Correct
+.{21;22}{t<200-1000>121;222:fb<01>}
+
+bin 3
+Flagged 2nd responses only - NO Negation - Incompatible, Correct
+.{21;22}{t<200-1000>121;222:fb<10>}

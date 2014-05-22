@@ -22,7 +22,7 @@ function varargout = bdfVisualizer(varargin)
 
 % Edit the above text to modify the response to help bdfVisualizer
 
-% Last Modified by GUIDE v2.5 20-May-2014 12:47:22
+% Last Modified by GUIDE v2.5 21-May-2014 13:11:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,6 +62,26 @@ guidata(hObject, handles);
 % uiwait(handles.figure1);
 
 
+% CREATE EVENTLIST VARIABLE
+BDFfilename     = fullfile(pwd,'testData','BDF-test.txt');
+ELISTfilename   = fullfile(pwd,'testData','ELIST-test.txt');
+
+[~, EVENTLIST]  = binlister( [] ... % emptyEEG
+    , BDFfilename       ...         % inputBinDescriptorFile
+    , ELISTfilename     ...         % inputEventList
+    , 'none'            ...         % outputEventList
+    ,  []               ...         % forbbideCodeArray
+    ,  []               ...         % ignoreCodeArray
+    ,  0                );          % reportable
+
+
+hUITableELIST               = handle(handles.uitableELIST);
+hUITableELIST.data          = squeeze(struct2cell(EVENTLIST.eventinfo))';
+hUITableELIST.columnWidth   = 'auto';
+hUITableELIST.columnName    = fieldnames(EVENTLIST.eventinfo);
+
+
+
 % --- Outputs from this function are returned to the command line.
 function varargout = bdfVisualizer_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -71,3 +91,19 @@ function varargout = bdfVisualizer_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
+
+% --- Executes on button press in pushbuttonLoadFile.
+function pushbuttonLoadFile_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonLoadFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over pushbuttonLoadFile.
+function pushbuttonLoadFile_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to pushbuttonLoadFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
