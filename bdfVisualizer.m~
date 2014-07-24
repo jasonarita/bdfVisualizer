@@ -171,8 +171,7 @@ function pushbuttonAnalyzeBDF_Callback(~, ~, handles)
 % hObject    handle to pushbuttonAnalyzeBDF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-pause(0.01);
-set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'off')
+set( findall(handles.your_uipanel, '-property', 'Enable'), 'Enable', 'off')
 
 % Load BDF
 hEditBDF        = handle(handles.editBDF);              % Retrieve BDF data from the GUI
@@ -212,8 +211,6 @@ hUITableBinlisterFeedback.data    = [totalEvents handles.eventList.trialsperbin]
 %% Cleanup
 delete(BDFfilename);                                    % Delete temporary BDF-file
 delete(ELISTfilename);                                  % Delete temporary ELIST-file
-set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
-
 
 % --- Executes on button press in pushbuttonLoadBDF.
 function pushbuttonLoadBDF_Callback(hObject, ~, handles)

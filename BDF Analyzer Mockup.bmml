@@ -1,0 +1,85 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1112" measuredH="521" mockupW="1093" mockupH="496">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="117" y="25" w="801" h="496" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>BDF%20Analyzer</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Button" x="721" y="82" w="180" h="27" measuredW="80" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>BDF%20Analyzer%20Mockup%20-%20Load%20BDF%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20BDF.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20BDF.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20BDF.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22702%2C57%2C882%2C84%22%20href%3D%22BDF%2520Analyzer%2520Mockup%2520-%2520Load%2520BDF.bmml%22%20alt%3D%22BDF%20Analyzer%20Mockup%20-%20Load%20BDF%22%20id%3D%222%22/%3E</map>
+        <menuIcon>false</menuIcon>
+        <state>up</state>
+        <text>Load%20BDF</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Button" x="721" y="128" w="180" h="27" measuredW="128" measuredH="27" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>BDF%20Analyzer%20Mockup%20-%20Load%20EventList%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20EventList.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20EventList.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Load%20EventList.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22702%2C103%2C882%2C130%22%20href%3D%22BDF%2520Analyzer%2520Mockup%2520-%2520Load%2520EventList.bmml%22%20alt%3D%22BDF%20Analyzer%20Mockup%20-%20Load%20EventList%22%20id%3D%223%22/%3E</map>
+        <state>up</state>
+        <text>Load%20EVENTLIST</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Button" x="721" y="170" w="180" h="27" measuredW="97" measuredH="27" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>BDF%20Analyzer%20Mockup%20-%20Analyze%20BDF%2025%26bm%3BBDF%20Analyzer%20Mockup%20-%20Analyze%20BDF%2025.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Analyze%20BDF%2025.bmml%26bm%3BBDF%20Analyzer%20Mockup%20-%20Analyze%20BDF%2025.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22702%2C145%2C882%2C172%22%20href%3D%22BDF%2520Analyzer%2520Mockup%2520-%2520Analyze%2520BDF%252025.bmml%22%20alt%3D%22BDF%20Analyzer%20Mockup%20-%20Analyze%20BDF%2025%22%20id%3D%224%22/%3E</map>
+        <state>up</state>
+        <text>Analyze%20BDF</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::TextArea" x="132" y="284" w="574" h="158" measuredW="200" measuredH="140" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14540253</color>
+        <state>up</state>
+        <text>Empty</text>
+        <verticalScrollbar>true</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::TextArea" x="132" y="60" w="574" h="201" measuredW="200" measuredH="140" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>15658734</color>
+        <state>up</state>
+        <text>event%20%20%20%20%20bin%20%20%20%20%20xxxxx%20%20%20%20%20%20yyyyyyy%20%20%20%20%20zzzzzzzz</text>
+        <value>0</value>
+        <verticalScrollbar>true</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::TextArea" x="721" y="284" w="180" h="158" measuredW="200" measuredH="140" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>up</state>
+        <text>Binlister%20Summary%0A%20%0ATrials%20in%20Bin%20X%3A%20%23%23%23%23%23%0ATrials%20in%20Bin%20Y%3A%20%23%23%23%23%23%0ATrials%20in%20Bin%20Z%3A%20%23%23%23%23%23%0A%20%0ATotal%20events%3A%20%20%20%23%23%23%23%23</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Button" x="721" y="212" w="180" h="27" measuredW="80" measuredH="27" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>up</state>
+        <text>Save%20BDF</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::VCurly" x="932" y="70" w="180" h="201" measuredW="180" measuredH="140" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Action%20Buttons</text>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="com.balsamiq.mockups::VCurly" x="19" y="293" w="84" h="140" measuredW="180" measuredH="140" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>right</direction>
+        <text>Editable%20Bin%20Descriptor%20Text</text>
+      </controlProperties>
+    </control>
+    <control controlID="19" controlTypeID="com.balsamiq.mockups::VCurly" x="19" y="60" w="84" h="201" measuredW="180" measuredH="140" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>right</direction>
+        <text>Editable%20Event%20List</text>
+      </controlProperties>
+    </control>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::VCurly" x="932" y="288" w="105" h="154" measuredW="180" measuredH="140" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Command%20line%20results%20of%20BINLISTER</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>
