@@ -171,8 +171,12 @@ function pushbuttonAnalyzeBDF_Callback(~, ~, handles)
 % hObject    handle to pushbuttonAnalyzeBDF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-pause(0.01);
-set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'off')
+
+try
+% We turn the interface off for processing.
+InterfaceObj=findobj(handle(handles.windowBDFVisualizer),'Enable','on');
+set(InterfaceObj,'Enable','off');
+
 
 % Load BDF
 hEditBDF        = handle(handles.editBDF);              % Retrieve BDF data from the GUI
@@ -214,6 +218,15 @@ delete(BDFfilename);                                    % Delete temporary BDF-f
 delete(ELISTfilename);                                  % Delete temporary ELIST-file
 set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
 
+
+% We turn back on the interface
+set(InterfaceObj,'Enable','on');
+
+
+catch errorObj
+    % If there is a problem, we display the error message
+    errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
+end
 
 % --- Executes on button press in pushbuttonLoadBDF.
 function pushbuttonLoadBDF_Callback(hObject, ~, handles)
