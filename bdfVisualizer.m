@@ -22,7 +22,7 @@ function varargout = bdfVisualizer(varargin)
 
 % Edit the above text to modify the response to help bdfVisualizer
 
-% Last Modified by GUIDE v2.5 22-Jul-2014 15:47:45
+% Last Modified by GUIDE v2.5 07-Aug-2014 11:09:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -90,6 +90,7 @@ hUITableBinlisterFeedback.data    = [0         , 0        ]';
 
 
 handles.lastPath = pwd;
+handles.EEG      = [];
 % Update handles structure
 guidata(hObject, handles);                                                          % save HANDLES structure to GUI
 
@@ -114,6 +115,10 @@ function pushbuttonLoadELIST_Callback(hObject, ~, handles) %#ok<*DEFNU>
 % Load in an ELIST-file & parse it into an ELIST-structure & display it to
 % the GUI
 [fileName, pathName]        = uigetfile({'*.txt', 'Event List File (.txt)'}, 'Select an event list file (ELIST)', handles.lastPath);
+if(pathName) 
+    handles.lastPath = pathName;                                             % Update the last directory in HANDLES
+    guidata(hObject,handles);                                                % Update the HANDLES data-structure
+end; 
 
 %% Default EventList Window
 if(~isequal(fileName,0) || ~isequal(pathName,0))
@@ -173,59 +178,78 @@ function pushbuttonAnalyzeBDF_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 try
-% We turn the interface off for processing.
-InterfaceObj=findobj(handle(handles.windowBDFVisualizer),'Enable','on');
-set(InterfaceObj,'Enable','off');
-
-
-% Load BDF
-hEditBDF        = handle(handles.editBDF);              % Retrieve BDF data from the GUI
-BDFfilename     = fullfile(pwd,'BDF-tmp.txt');          % Create temporary BDF-file
-fileID          = fopen(BDFfilename, 'wt');             % 
-fprintf(fileID,'%s\n', hEditBDF.string{:});             %
-fclose( fileID);
-
-% Load ELIST
-objELIST                    = handle(handles.uitableELIST);         % Get the current Event List from the GUI
-handles.eventList.eventinfo = cell2struct(objELIST.Data, fieldnames(handles.eventList.eventinfo), 2);
-ELISTfilename               = fullfile(pwd,'ELIST-tmp.txt');        % Create temporary ELIST-file
-creaeventlist([],handles.eventList,ELISTfilename,1);                % Write eventlist to file
-
-%% RUN BINLISTER
-[~, handles.eventList]  = binlister( [] ... % emptyEEG
-    , BDFfilename       ...         % inputBinDescriptorFile
-    , ELISTfilename     ...         % inputEventList
-    , 'none'            ...         % outputEventList
-    ,  []               ...         % forbbideCodeArray
-    ,  []               ...         % ignoreCodeArray
-    ,  0                );          % reportable
-
-
-%% Display updated ELIST-struct to GUI
-hUITableELIST                     = handle(handles.uitableELIST);
-hUITableELIST.data                = squeeze(struct2cell(handles.eventList.eventinfo))';
-% hUITableELIST.columnWidth         = 'auto';
-hUITableELIST.columnName          = fieldnames(handles.eventList.eventinfo);
-
-%% Display updated BDF Feedback window
-totalEvents                       = length(handles.eventList.eventinfo);
-hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);
-hUITableBinlisterFeedback.rowName = { 'Total Event Codes', handles.eventList.bdf.namebin };
-hUITableBinlisterFeedback.data    = [totalEvents handles.eventList.trialsperbin]';
-
-%% Cleanup
-delete(BDFfilename);                                    % Delete temporary BDF-file
-delete(ELISTfilename);                                  % Delete temporary ELIST-file
-set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
-
-
-% We turn back on the interface
-set(InterfaceObj,'Enable','on');
-
-
+    % Turn the interface off for processing.
+    %     InterfaceObj=findobj(handle(handles.windowBDFVisualizer),'Enable','on');
+    %     set(InterfaceObj,'Enable','off');
+    
+    
+    % Load BDF
+    hEditBDF        = handle(handles.editBDF);              % Retrieve BDF data from the GUI
+    BDFfilename     = fullfile(pwd,'BDF-tmp.txt');          % Create temporary BDF-file
+    fileID          = fopen(BDFfilename, 'wt');             %
+    fprintf(fileID,'%s\n', hEditBDF.string{:});             %
+    fclose( fileID);
+    
+    % Load ELIST
+    objELIST                    = handle(handles.uitableELIST);                         % Get the current Event List from the GUI
+    handles.eventList.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
+    ELISTfilename               = fullfile(pwd,'ELIST-tmp.txt');                        % Create temporary ELIST-file
+    creaeventlist([],handles.eventList,ELISTfilename,1);                                % Write eventlist to file
+    
+    
+    %% RUN BINLISTER
+    [handles.EEG, handles.eventList]  = binlister( handles.EEG ... % emptyEEG
+        , BDFfilename       ...         % inputBinDescriptorFile
+        , ELISTfilename     ...         % inputEventList
+        , 'none'            ...         % outputEventList
+        , []                ...         % forbiddenCodeArray
+        , []                ...         % ignoreCodeArray
+        , 0                 );          % reportable
+    
+    
+    %% Display updated ELIST-struct to GUI
+    % if(isempty(handles.EEG))
+    %     tableEventList                    = struct2table(handles.eventList.eventinfo);
+    % else
+    %     tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
+    % end
+    
+    tableEventList                    = struct2table(handles.eventList.eventinfo);
+    hUITableELIST                     = handle(handles.uitableELIST);
+    hUITableELIST.data                = table2cell(tableEventList);
+    hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
+    
+    % hUITableELIST.columnWidth         = 'auto';
+    % hUITableELIST.columnName          = fieldnames(handles.eventList.eventinfo);
+    
+    
+    
+    %% Display updated BDF Feedback window
+    totalEvents                       = length(handles.eventList.eventinfo);
+    hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);
+    hUITableBinlisterFeedback.rowName = { 'Total Event Codes', handles.eventList.bdf.namebin };
+    hUITableBinlisterFeedback.data    = [totalEvents handles.eventList.trialsperbin]';
+    
+    %% Cleanup
+    delete(BDFfilename);                                    % Delete temporary BDF-file
+    delete(ELISTfilename);                                  % Delete temporary ELIST-file
+    set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
+    
+    % Turn the interface back on 
+    %     set(InterfaceObj,'Enable','on');
+    
+    
 catch errorObj
-    % If there is a problem, we display the error message
-    errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
+    % If there is a problem, display the error message
+    display(getReport(errorObj,'extended','hyperlinks','on'),'Error');
+%     set(InterfaceObj,'Enable','on');
+    
+    if(strcmpi(errorObj.stack(1).name, 'binlister') && errorObj.stack(1).line == 706)
+        errordlg(sprintf('\n\nCannot analyze a BDF file containing RT-flags without an EEG dataset.\n\nRemove exist RT-flags from the BDF-file or load an existing EEG dataset.\n\n'), 'RT-Flag Error');
+    else 
+        errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
+    end
+
 end
 
 % --- Executes on button press in pushbuttonLoadBDF.
@@ -234,24 +258,118 @@ function pushbuttonLoadBDF_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-%% BDF LOAD
-[fileName, pathName]            = uigetfile('*.txt', 'Select a bin descriptor file (BDF)', handles.lastPath);
-
-if(~isequal(fileName,0) || ~isequal(fileName,0))
-    % Load file into ELIST-structure via READEVENTLIST
-    BDFfilename                 = fullfile(pathName,fileName);
-    fileID                      = fopen(BDFfilename);
-    fileString                  = textscan(fileID, '%s', 'Delimiter','\n'); 
-    fclose(fileID);
-
-    handles.bdf                 = fileString{1};    % Update the BDF variable in HANDLES
-    handles.lastPath            = pathName;         % Update the last directory in HANDLES
-    guidata(hObject,handles);                       % Update the HANDLES data-structure
+try
     
-    %% DISPLAY LOADED BDF TO GUI
-    hEditBDF               = handle(handles.editBDF);
-    hEditBDF.string        = handles.bdf;
-else
-    % User-selected Cancel
-    display('User selected cancel');
+    [fileName, pathName, filterIndex] = uigetfile(              ...
+        {'*.txt', 'Select a bin descriptor file (BDF)'   ...
+        ; '*.*'  , 'All files (*.*)'                   } ...
+        , handles.lastPath);
+    if(pathName)
+        handles.lastPath = pathName;                                             % Update the last directory in HANDLES
+        guidata(hObject,handles);                                                % Update the HANDLES data-structure
+    end
+    
+    switch(filterIndex)
+        case 0
+            % User-selected Cancel
+            display('User selected cancel');
+        otherwise
+            % Load file into ELIST-structure via READEVENTLIST
+            BDFfilename                 = fullfile(pathName,fileName);
+            fileID                      = fopen(BDFfilename);
+            fileString                  = textscan(fileID, '%s', 'Delimiter','\n');
+            fclose(fileID);
+            
+            handles.bdf                 = fileString{1};    % Update the BDF variable in HANDLES
+            handles.lastPath            = pathName;         % Update the last directory in HANDLES
+            guidata(hObject,handles);                       % Update the HANDLES data-structure
+            
+            %% DISPLAY LOADED BDF TO GUI
+            hEditBDF               = handle(handles.editBDF);
+            hEditBDF.string        = handles.bdf;
+    end
+    
+catch errorObj
+    % If there is a problem, display the error message
+    display(getReport(errorObj,'extended','hyperlinks','on'),'Error');
+%     set(InterfaceObj,'Enable','on');
+    
+    if(strcmpi(errorObj.stack(1).name, 'readeventlist') && errorObj.stack(1).line == 140)
+        errordlg(sprintf('\n\nIncorrect File Type:\tFile is not an acceptable BIN DESCRIPTOR FILE.\n\nSelect another BDF0file\n\n'), 'Incorrect File Type Error');
+    else 
+        errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
+    end
+
+end
+
+% --- Executes on button press in pushbuttonLoadEventList.
+function pushbuttonLoadEventList_Callback(hObject, ~, handles)
+% hObject    handle to pushbuttonLoadEventList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+try
+    
+    [fileName, pathName, filterIndex]        = uigetfile(               ...
+        {'*.txt;*.set', 'ELIST (*.txt) or EEG file (*.set)';            ...
+        '*.*','All Files (*.*)'                                }        ...
+        , 'MultiSelect', 'off'                                          ...
+        , handles.lastPath);   % Get filename/filepath
+    
+    if(pathName)
+        handles.lastPath = pathName;                                                            % Update the last directory in HANDLES
+        guidata(hObject,handles);                                                               % Update the HANDLES data-structure
+    end;
+    
+    
+    % Check if FILE SELECTED or if CANCEL is selected
+    switch(filterIndex)
+        case 0  % CANCEL
+            display('User selected cancel');                                                    % User-selected Cancel
+        case 1  % ELIST-TXT file
+            
+            ELISTfilename               = fullfile(pathName,fileName);                          % Load file into ELIST-structure via READEVENTLIST
+            [~, handles.eventList]      = readeventlist([], ELISTfilename);
+            
+            hUITableELIST               = handle(handles.uitableELIST);                         % Update the GUI ELIST uiTable
+            hUITableELIST.data          = squeeze(struct2cell(handles.eventList.eventinfo))';
+            
+        case 2 % EEG-SET file
+            handles.EEG = pop_loadset('filename',fileName,'filepath',pathName);
+            handles.EEG = eeg_checkset( handles.EEG );
+            
+            
+            % Create EVENTLIST from EEG dataset
+            handles.EEG  = pop_creabasiceventlist( handles.EEG ...
+                ... %         , 'Eventlist','/Users/etfoo/Documents/MATLAB/Eventlist.txt' ...
+                , 'AlphanumericCleaning'    , 'on'              ...
+                , 'BoundaryNumeric'         , { -99 }           ...
+                , 'BoundaryString'          , { 'boundary' }    ...
+                , 'Warning'                 , 'on'              ...
+                );
+            
+            handles.eventList = [];
+            
+            % Update the GUI ELIST uiTable
+            tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
+            hUITableELIST                     = handle(handles.uitableELIST);
+            hUITableELIST.data                = table2cell(tableEventList);
+            hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
+            
+        otherwise
+    end
+    
+    guidata(hObject,handles);                                                                   % Update the HANDLES data-structure
+    
+catch errorObj
+    % If there is a problem, display the error message
+    display(getReport(errorObj,'extended','hyperlinks','on'),'Error');
+%     set(InterfaceObj,'Enable','on');
+    
+    if(strcmpi(errorObj.stack(1).name, 'readeventlist') && errorObj.stack(1).line == 140)
+        errordlg(sprintf('\n\nIncorrect File Type:\tFile does not contain an acceptable EVENT LIST FILE.\n\nSelect another file\n\n'), 'Incorrect File Type Error');
+    else 
+        errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
+    end
+
 end
