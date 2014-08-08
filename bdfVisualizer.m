@@ -22,7 +22,7 @@ function varargout = bdfVisualizer(varargin)
 
 % Edit the above text to modify the response to help bdfVisualizer
 
-% Last Modified by GUIDE v2.5 07-Aug-2014 11:09:16
+% Last Modified by GUIDE v2.5 07-Aug-2014 17:21:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,13 +64,15 @@ guidata(hObject, handles);
 
 %% Load default ELIST
 ELISTfilename               = fullfile(pwd,'testData','defaultELIST.txt');          % set default EVENTLIST filename
-[~, handles.eventList]      = readeventlist([], ELISTfilename);                     % read EVENTLIST from file
+[~, handles.EEG.EVENTLIST]              = readeventlist([], ELISTfilename);                     % read EVENTLIST from file
 guidata(hObject, handles);                                                          % save EVENTLIST to HANDLES
 
-hUITableELIST               = handle(handles.uitableELIST);
-hUITableELIST.data          = squeeze(struct2cell(handles.eventList.eventinfo))';   % Display ELIST-struct to GUI
-hUITableELIST.columnName    = fieldnames(handles.eventList.eventinfo);
-% hUITableELIST.columnWidth   = 'auto';
+% Display updated ELIST-struct to GUI
+tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
+hUITableELIST                     = handle(handles.uitableELIST);
+hUITableELIST.data                = table2cell(tableEventList);
+hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
+
 
 
 %% Load default BDF
@@ -85,8 +87,8 @@ hEditBDF.string        = handles.bdf;                                           
 
 %% Initiate default BDF Feedback Window
 hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);   
-hUITableBinlisterFeedback.rowName = { 'Total Event Codes', 'Bin 1'  };          
-hUITableBinlisterFeedback.data    = [0         , 0        ]';                   
+% hUITableBinlisterFeedback.rowName = { 'Total Event Codes', 'Bin 1'  };          
+hUITableBinlisterFeedback.data    = {{ 'Total Event Codes', 'Bin 1'  }', [0         , 0        ]'};                   
 
 
 handles.lastPath = pwd;
@@ -123,12 +125,12 @@ end;
 %% Default EventList Window
 if(~isequal(fileName,0) || ~isequal(pathName,0))
     ELISTfilename               = fullfile(pathName,fileName);                          % Load file into ELIST-structure via READEVENTLIST
-    [~, handles.eventList]      = readeventlist([], ELISTfilename);
+    handles.EEG                 = readeventlist(handles.EEG, ELISTfilename);
     handles.lastPath            = pathName;                                             % Update the last directory in HANDLES
 
     % Default ELIST-struct to GUI
     hUITableELIST               = handle(handles.uitableELIST);
-    hUITableELIST.data          = squeeze(struct2cell(handles.eventList.eventinfo))';
+    hUITableELIST.data          = squeeze(struct2cell(handles.EEG.EVENTLIST.eventinfo))';
     
     guidata(hObject,handles);                                                           % Update the HANDLES data-structure
 
@@ -192,15 +194,15 @@ try
     
     % Load ELIST
     objELIST                    = handle(handles.uitableELIST);                         % Get the current Event List from the GUI
-    handles.eventList.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
-    ELISTfilename               = fullfile(pwd,'ELIST-tmp.txt');                        % Create temporary ELIST-file
-    creaeventlist([],handles.eventList,ELISTfilename,1);                                % Write eventlist to file
+%     handles.EEG.EVENTLIST.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
+%     ELISTfilename               = fullfile(pwd,'ELIST-tmp.txt');                        % Create temporary ELIST-file
+%     creaeventlist([],handles.EEG.EVENTLIST,ELISTfilename,1);                                % Write eventlist to file
     
-    
+    handles.EEG.EVENTLIST.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
     %% RUN BINLISTER
-    [handles.EEG, handles.eventList]  = binlister( handles.EEG ... % emptyEEG
+    [handles.EEG, handles.EEG.EVENTLIST]  = binlister( handles.EEG ... % emptyEEG
         , BDFfilename       ...         % inputBinDescriptorFile
-        , ELISTfilename     ...         % inputEventList
+        , 'none'            ...         % inputEventList
         , 'none'            ...         % outputEventList
         , []                ...         % forbiddenCodeArray
         , []                ...         % ignoreCodeArray
@@ -208,32 +210,25 @@ try
     
     
     %% Display updated ELIST-struct to GUI
-    % if(isempty(handles.EEG))
-    %     tableEventList                    = struct2table(handles.eventList.eventinfo);
-    % else
-    %     tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
-    % end
-    
-    tableEventList                    = struct2table(handles.eventList.eventinfo);
+    tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
     hUITableELIST                     = handle(handles.uitableELIST);
     hUITableELIST.data                = table2cell(tableEventList);
     hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
     
     % hUITableELIST.columnWidth         = 'auto';
-    % hUITableELIST.columnName          = fieldnames(handles.eventList.eventinfo);
+    % hUITableELIST.columnName          = fieldnames(handles.EEG.EVENTLIST.eventinfo);
     
     
     
     %% Display updated BDF Feedback window
-    totalEvents                       = length(handles.eventList.eventinfo);
+    totalEvents                       = length(handles.EEG.EVENTLIST.eventinfo);
     hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);
-    hUITableBinlisterFeedback.rowName = { 'Total Event Codes', handles.eventList.bdf.namebin };
-    hUITableBinlisterFeedback.data    = [totalEvents handles.eventList.trialsperbin]';
-    
+    %     hUITableBinlisterFeedback.rowName = { 'Total Event Codes', handles.EEG.EVENTLIST.bdf.namebin };
+    hUITableBinlisterFeedback.data    = [{'Total Event Codes' handles.EEG.EVENTLIST.bdf.namebin}', num2cell([totalEvents handles.EEG.EVENTLIST.trialsperbin])'];
     %% Cleanup
     delete(BDFfilename);                                    % Delete temporary BDF-file
-    delete(ELISTfilename);                                  % Delete temporary ELIST-file
-    set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
+%     delete(ELISTfilename);                                  % Delete temporary ELIST-file
+%     set( findall(handles.windowBDFVisualizer, '-property', 'Enable'), 'Enable', 'on')
     
     % Turn the interface back on 
     %     set(InterfaceObj,'Enable','on');
@@ -310,31 +305,39 @@ function pushbuttonLoadEventList_Callback(hObject, ~, handles)
 
 try
     
-    [fileName, pathName, filterIndex]        = uigetfile(               ...
+    
+    [fileName, pathName]        = uigetfile(               ...
         {'*.txt;*.set', 'ELIST (*.txt) or EEG file (*.set)';            ...
         '*.*','All Files (*.*)'                                }        ...
         , 'MultiSelect', 'off'                                          ...
         , handles.lastPath);   % Get filename/filepath
     
     if(pathName)
-        handles.lastPath = pathName;                                                            % Update the last directory in HANDLES
-        guidata(hObject,handles);                                                               % Update the HANDLES data-structure
-    end;
+        [~,~,fileExtension] = fileparts(fileName);
+%         handles.lastPath    = pathName;                                                             % Update the last directory in HANDLES
+%         guidata(hObject,handles);                                                                   % Update the HANDLES data-structure
+    else
+        fileExtension       = 'cancel';
+    end
     
     
     % Check if FILE SELECTED or if CANCEL is selected
-    switch(filterIndex)
-        case 0  % CANCEL
+    
+    switch(fileExtension)
+        case 'cancel'  % CANCEL
             display('User selected cancel');                                                    % User-selected Cancel
-        case 1  % ELIST-TXT file
+        case '.txt'  % ELIST-TXT file
             
             ELISTfilename               = fullfile(pathName,fileName);                          % Load file into ELIST-structure via READEVENTLIST
-            [~, handles.eventList]      = readeventlist([], ELISTfilename);
+            [~, handles.EEG.EVENTLIST]  = readeventlist([], ELISTfilename);
             
-            hUITableELIST               = handle(handles.uitableELIST);                         % Update the GUI ELIST uiTable
-            hUITableELIST.data          = squeeze(struct2cell(handles.eventList.eventinfo))';
-            
-        case 2 % EEG-SET file
+            % Display updated ELIST-struct to GUI
+            tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
+            hUITableELIST                     = handle(handles.uitableELIST);
+            hUITableELIST.data                = table2cell(tableEventList);
+            hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
+
+        case '.set' % EEG-SET file
             handles.EEG = pop_loadset('filename',fileName,'filepath',pathName);
             handles.EEG = eeg_checkset( handles.EEG );
             
@@ -348,7 +351,6 @@ try
                 , 'Warning'                 , 'on'              ...
                 );
             
-            handles.eventList = [];
             
             % Update the GUI ELIST uiTable
             tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
