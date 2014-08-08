@@ -45,7 +45,7 @@ end
 
 
 % --- Executes just before bdfVisualizer is made visible.
-function bdfVisualizer_OpeningFcn(hObject, ~, handles, varargin)
+function bdfVisualizer_OpeningFcn(hObject, ~, handles, varargin) %#ok<*DEFNU>
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -87,7 +87,6 @@ hEditBDF.string        = handles.bdf;                                           
 
 %% Initiate default BDF Feedback Window
 hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);   
-% hUITableBinlisterFeedback.rowName = { 'Total Event Codes', 'Bin 1'  };          
 hUITableBinlisterFeedback.data    = {{ 'Total Event Codes', 'Bin 1'  }', [0         , 0        ]'};                   
 
 
@@ -106,48 +105,6 @@ function varargout = bdfVisualizer_OutputFcn(~, ~, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
-
-% --- Executes on button press in pushbuttonLoadELIST.
-function pushbuttonLoadELIST_Callback(hObject, ~, handles) %#ok<*DEFNU>
-% hObject    handle to pushbuttonLoadELIST (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Load in an ELIST-file & parse it into an ELIST-structure & display it to
-% the GUI
-[fileName, pathName]        = uigetfile({'*.txt', 'Event List File (.txt)'}, 'Select an event list file (ELIST)', handles.lastPath);
-if(pathName) 
-    handles.lastPath = pathName;                                             % Update the last directory in HANDLES
-    guidata(hObject,handles);                                                % Update the HANDLES data-structure
-end; 
-
-%% Default EventList Window
-if(~isequal(fileName,0) || ~isequal(pathName,0))
-    ELISTfilename               = fullfile(pathName,fileName);                          % Load file into ELIST-structure via READEVENTLIST
-    handles.EEG                 = readeventlist(handles.EEG, ELISTfilename);
-    handles.lastPath            = pathName;                                             % Update the last directory in HANDLES
-
-    % Default ELIST-struct to GUI
-    hUITableELIST               = handle(handles.uitableELIST);
-    hUITableELIST.data          = squeeze(struct2cell(handles.EEG.EVENTLIST.eventinfo))';
-    
-    guidata(hObject,handles);                                                           % Update the HANDLES data-structure
-
-else
-    display('User selected cancel');  % User selected Cancel
-end
-
-
-
-
-
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over pushbuttonLoadELIST.
-function pushbuttonLoadELIST_ButtonDownFcn(~, ~, ~)
-% hObject    handle to pushbuttonLoadELIST (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 
@@ -240,7 +197,9 @@ catch errorObj
 %     set(InterfaceObj,'Enable','on');
     
     if(strcmpi(errorObj.stack(1).name, 'binlister') && errorObj.stack(1).line == 706)
-        errordlg(sprintf('\n\nCannot analyze a BDF file containing RT-flags without an EEG dataset.\n\nRemove exist RT-flags from the BDF-file or load an existing EEG dataset.\n\n'), 'RT-Flag Error');
+        errordlg(sprintf('\n\n\tCannot analyze a BDF file containing RT-flags without an EEG dataset.\n\n\tRemove exist RT-flags from the BDF-file or load an existing EEG dataset.\n\n'), 'RT-Flag Error');
+    elseif(strcmpi(errorObj.stack(1).name, 'pushbuttonAnalyzeBDF_Callback') && errorObj.stack(1).line == 171)
+        errordlg(sprintf('\n\n\tBin numbers must be in sequential order.\n\n\tFix your bin numbers.\n\n'), 'BDF - Bin Number Error');
     else 
         errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
     end
@@ -258,6 +217,7 @@ try
     [fileName, pathName, filterIndex] = uigetfile(              ...
         {'*.txt', 'Select a bin descriptor file (BDF)'   ...
         ; '*.*'  , 'All files (*.*)'                   } ...
+        , 'Select BDF File' ...
         , handles.lastPath);
     if(pathName)
         handles.lastPath = pathName;                                             % Update the last directory in HANDLES
@@ -310,12 +270,17 @@ try
         {'*.txt;*.set', 'ELIST (*.txt) or EEG file (*.set)';            ...
         '*.*','All Files (*.*)'                                }        ...
         , 'MultiSelect', 'off'                                          ...
-        , handles.lastPath);   % Get filename/filepath
+        , 'Select Event List Source'                                    ...
+    , handles.lastPath);   % Get filename/filepath
     
     if(pathName)
+        % Clear the Binlister Feedback uiTable
+        hUITableBinlisterFeedback         = handle(handles.uitableBinlisterFeedback);
+        hUITableBinlisterFeedback.data    = {{ 'Total Event Codes', 'Bin 1'  }', [0         , 0        ]'};
+
         [~,~,fileExtension] = fileparts(fileName);
-%         handles.lastPath    = pathName;                                                             % Update the last directory in HANDLES
-%         guidata(hObject,handles);                                                                   % Update the HANDLES data-structure
+        handles.lastPath    = pathName;                                                             % Update the last directory in HANDLES
+        guidata(hObject,handles);                                                                   % Update the HANDLES data-structure
     else
         fileExtension       = 'cancel';
     end
