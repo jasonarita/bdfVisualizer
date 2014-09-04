@@ -22,7 +22,7 @@ function varargout = bdfVisualizer(varargin)
 
 % Edit the above text to modify the response to help bdfVisualizer
 
-% Last Modified by GUIDE v2.5 07-Aug-2014 17:21:05
+% Last Modified by GUIDE v2.5 15-Aug-2014 11:28:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,12 +67,15 @@ ELISTfilename               = fullfile(pwd,'testData','defaultELIST.txt');      
 [~, handles.EEG.EVENTLIST]              = readeventlist([], ELISTfilename);                     % read EVENTLIST from file
 guidata(hObject, handles);                                                          % save EVENTLIST to HANDLES
 
-% Display updated ELIST-struct to GUI
+% UPDATE GUI: ELIST Window
 tableEventList                    = struct2table(handles.EEG.EVENTLIST.eventinfo);
 hUITableELIST                     = handle(handles.uitableELIST);
 hUITableELIST.data                = table2cell(tableEventList);
 hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
 
+% UPDATE GUI: Eventlist Max window
+hEditEventlistMax                 = handle(handles.editTxtEventlistMax);              % Retrieve data from the GUI
+hEditEventlistMax.string          = num2str(length(hUITableELIST.data));
 
 
 %% Load default BDF
@@ -141,6 +144,9 @@ try
     %     InterfaceObj=findobj(handle(handles.windowBDFVisualizer),'Enable','on');
     %     set(InterfaceObj,'Enable','off');
     
+    hEditEventlistMax   = handle(handles.editTxtEventlistMax);              % Retrieve BDF data from the GUI
+    eventlistMax        = str2double(hEditEventlistMax.string);
+
     
     % Load BDF
     hEditBDF        = handle(handles.editBDF);              % Retrieve BDF data from the GUI
@@ -151,11 +157,8 @@ try
     
     % Load ELIST
     objELIST                    = handle(handles.uitableELIST);                         % Get the current Event List from the GUI
-%     handles.EEG.EVENTLIST.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
-%     ELISTfilename               = fullfile(pwd,'ELIST-tmp.txt');                        % Create temporary ELIST-file
-%     creaeventlist([],handles.EEG.EVENTLIST,ELISTfilename,1);                                % Write eventlist to file
     
-    handles.EEG.EVENTLIST.eventinfo = cell2struct(objELIST.Data, objELIST.ColumnName', 2);  %
+    handles.EEG.EVENTLIST.eventinfo = cell2struct(objELIST.Data(1:eventlistMax,:), objELIST.ColumnName', 2);  %
     %% RUN BINLISTER
     [handles.EEG, handles.EEG.EVENTLIST]  = binlister( handles.EEG ... % emptyEEG
         , BDFfilename       ...         % inputBinDescriptorFile
@@ -257,9 +260,9 @@ catch errorObj
 
 end
 
-% --- Executes on button press in pushbuttonLoadEventList.
-function pushbuttonLoadEventList_Callback(hObject, ~, handles)
-% hObject    handle to pushbuttonLoadEventList (see GCBO)
+% --- Executes on button press in pushbuttonImportEventList.
+function pushbuttonImportEventList_Callback(hObject, ~, handles)
+% hObject    handle to pushbuttonImportEventList (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -302,6 +305,11 @@ try
             hUITableELIST.data                = table2cell(tableEventList);
             hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
 
+            % UPDATE GUI: Eventlist Max window
+            hEditEventlistMax                 = handle(handles.editTxtEventlistMax);              % Retrieve data from the GUI
+            hEditEventlistMax.string          = num2str(length(hUITableELIST.data));
+
+            
         case '.set' % EEG-SET file
             handles.EEG = pop_loadset('filename',fileName,'filepath',pathName);
             handles.EEG = eeg_checkset( handles.EEG );
@@ -322,7 +330,11 @@ try
             hUITableELIST                     = handle(handles.uitableELIST);
             hUITableELIST.data                = table2cell(tableEventList);
             hUITableELIST.ColumnName          = tableEventList.Properties.VariableNames';
-            
+
+            % UPDATE GUI: Eventlist Max window
+            hEditEventlistMax                 = handle(handles.editTxtEventlistMax);              % Retrieve data from the GUI
+            hEditEventlistMax.string          = num2str(length(hUITableELIST.data));
+           
         otherwise
     end
     
@@ -339,4 +351,27 @@ catch errorObj
         errordlg(getReport(errorObj,'extended','hyperlinks','off'),'Error');
     end
 
+end
+
+
+
+function editTxtEventlistMax_Callback(~, ~, ~)
+% hObject    handle to editTxtEventlistMax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editTxtEventlistMax as text
+%        str2double(get(hObject,'String')) returns contents of editTxtEventlistMax as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function editTxtEventlistMax_CreateFcn(hObject, ~, ~)
+% hObject    handle to editTxtEventlistMax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
